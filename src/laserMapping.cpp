@@ -275,7 +275,7 @@ void pointBodyToWorld(PointType const * const pi, PointType * const po)
 }
 
 template<typename T>
-void pointBodyToWorld(const Matrix<T, 3, 1> &pi, Matrix<T, 3, 1> &po)
+void pointBodyToWorld(const Eigen::Matrix<T, 3, 1> &pi, Eigen::Matrix<T, 3, 1> &po)
 {
     V3D p_body(pi[0], pi[1], pi[2]);
     #ifdef USE_IKFOM
@@ -1641,7 +1641,7 @@ int main(int argc, char** argv)
                     auto &&Hsub_T = Hsub.transpose();
                     auto &&HTz = Hsub_T * meas_vec;
                     H_T_H.block<6,6>(0,0) = Hsub_T * Hsub;
-                    // EigenSolver<Matrix<double, 6, 6>> es(H_T_H.block<6,6>(0,0));
+                    // EigenSolver<Eigen::Matrix<double, 6, 6>> es(H_T_H.block<6,6>(0,0));
                     MD(DIM_STATE, DIM_STATE) &&K_1 = \
                             (H_T_H + (state.cov / LASER_POINT_COV).inverse()).inverse();
                     G.block<DIM_STATE,6>(0,0) = K_1.block<DIM_STATE,6>(0,0) * H_T_H.block<6,6>(0,0);

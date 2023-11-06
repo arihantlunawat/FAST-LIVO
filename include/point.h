@@ -24,7 +24,7 @@
 
 namespace lidar_selection {
 
-typedef Matrix<double, 2, 3> Matrix23d;
+typedef Eigen::Matrix<double, 2, 3> Matrix23d;
 
 /// A 3D point on the surface of the scene.
 class Point : boost::noncopyable

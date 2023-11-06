@@ -51,7 +51,7 @@ class LidarSelector {
     int frame_cont = 1;
     vk::robust_cost::ScaleEstimatorPtr scale_estimator_;
 
-    Matrix<double, DIM_STATE, DIM_STATE> G, H_T_H;
+    Eigen::Matrix<double, DIM_STATE, DIM_STATE> G, H_T_H;
     MatrixXd H_sub, K;
     cv::flann::Index Kdtree;
 
@@ -83,7 +83,7 @@ class LidarSelector {
       const Vector2d& px_ref,
       const Vector3d& f_ref,
       const double depth_ref,
-      const SE3& T_cur_ref,
+      const Sophus::SE3<double>& T_cur_ref,
       const int level_ref,    // px_ref对应特征点的金字塔层级
       const int pyramid_level,
       const int halfpatch_size,

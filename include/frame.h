@@ -43,8 +43,8 @@ public:
   int                           id_;                    //!< Unique id of the frame.
   // double                        timestamp_;             //!< Timestamp of when the image was recorded.
   vk::AbstractCamera*           cam_;                   //!< Camera model.
-  SE3                           T_f_w_;                 //!< Transform (f)rame from (w)orld.
-  Matrix<double, 6, 6>          Cov_;                   //!< Covariance.
+  Sophus::SE3<double>                          T_f_w_;                 //!< Transform (f)rame from (w)orld.
+  Eigen::Matrix<double, 6, 6>          Cov_;                   //!< Covariance.
   ImgPyr                        img_pyr_;               //!< Image Pyramid.
   Features                      fts_;                   //!< List of features in the image.
   vector<FeaturePtr>              key_pts_;               //!< Five features and associated 3D points which are used to detect if two frames have overlapping field of view.
@@ -111,9 +111,9 @@ public:
   inline static void jacobian_xyz2uv_change(
       const Vector3d& xyz_in_world,
       const Vector3d& xyz_in_f,
-      Matrix<double,2,6>& J,
-      SE3& Tbc,
-      SE3& T_ref_w,
+      Eigen::Matrix<double,2,6>& J,
+      Sophus::SE3<double>& Tbc,
+      Sophus::SE3<double>& T_ref_w,
       double fx)
   {
     //Vector3d xyz_in_imu = Tbc * xyz_in_world;
@@ -129,8 +129,8 @@ public:
     const double y_in_world = xyz_in_world[1];
     const double z_in_world = xyz_in_world[2];
 
-    Matrix<double,2,3> J1;
-    Matrix<double,3,6> J2;
+    Eigen::Matrix<double,2,3> J1;
+    Eigen::Matrix<double,3,6> J2;
 
     J1(0,0) = -fx * z_inv;              
     J1(0,1) = 0.0;              
@@ -161,12 +161,12 @@ public:
     J2(2,4) = -x_in_world;       
     J2(2,5) = 0.0;   
     
-    J = J1 * T_ref_w.rotation_matrix() * J2;// * J2;   
+    J = J1 * T_ref_w.rotationMatrix() * J2;// * J2;   
   }
 
   inline static void jacobian_xyz2uv(
     const Vector3d& xyz_in_f,
-    Matrix<double,2,6>& J)
+    Eigen::Matrix<double,2,6>& J)
   {
     const double x = xyz_in_f[0];
     const double y = xyz_in_f[1];
