@@ -525,16 +525,6 @@ void ImuProcess::Process(const LidarMeasureGroup &lidar_meas,  esekfom::esekf<st
 
   t2 = omp_get_wtime();
 
-  // {
-  //   static ros::Publisher pub_UndistortPcl =
-  //       nh.advertise<sensor_msgs::PointCloud2>("/livox_undistort", 100);
-  //   sensor_msgs::PointCloud2 pcl_out_msg;
-  //   pcl::toROSMsg(*cur_pcl_un_, pcl_out_msg);
-  //   pcl_out_msg.header.stamp = ros::Time().fromSec(meas.lidar_beg_time);
-  //   pcl_out_msg.header.frame_id = "/livox";
-  //   pub_UndistortPcl.publish(pcl_out_msg);
-  // }
-
   t3 = omp_get_wtime();
   
   // cout<<"[ IMU Process ]: Time: "<<t3 - t1<<endl;
@@ -604,16 +594,6 @@ void ImuProcess::Process(const LidarMeasureGroup &lidar_meas, StatesGroup &stat,
   }
 
   t2 = omp_get_wtime();
-
-  // {
-  //   static ros::Publisher pub_UndistortPcl =
-  //       nh.advertise<sensor_msgs::PointCloud2>("/livox_undistort", 100);
-  //   sensor_msgs::PointCloud2 pcl_out_msg;
-  //   pcl::toROSMsg(*cur_pcl_un_, pcl_out_msg);
-  //   pcl_out_msg.header.stamp = ros::Time().fromSec(meas.lidar_beg_time);
-  //   pcl_out_msg.header.frame_id = "/livox";
-  //   pub_UndistortPcl.publish(pcl_out_msg);
-  // }
 
   t3 = omp_get_wtime();
   
