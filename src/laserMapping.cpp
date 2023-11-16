@@ -59,6 +59,7 @@
 #include <tf/transform_broadcaster.h>
 #include <fast_livo/States.h>
 #include <geometry_msgs/Vector3.h>
+#include <livox_ros_driver/CustomMsg.h>
 #include "preprocess.h"
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/opencv.hpp>
@@ -429,6 +430,25 @@ void standard_pcl_cbk(const sensor_msgs::PointCloud2::ConstPtr &msg)
     // last_timestamp_lidar = msg->header.stamp.toSec() - 0.1;
     time_buffer.push_back(msg->header.stamp.toSec());
     last_timestamp_lidar = msg->header.stamp.toSec();
+    mtx_buffer.unlock();
+    sig_buffer.notify_all();
+}
+
+void livox_pcl_cbk(const livox_ros_driver::CustomMsg::ConstPtr &msg) 
+{
+    mtx_buffer.lock();
+    if (msg->header.stamp.toSec() < last_timestamp_lidar)
+    {
+        ROS_ERROR("lidar loop back, clear buffer");
+        lidar_buffer.clear();
+    }
+    printf("[ INFO ]: get point cloud at time: %.6f.\n", msg->header.stamp.toSec());
+    PointCloudXYZI::Ptr ptr(new PointCloudXYZI());
+    p_pre->process(msg, ptr);
+    lidar_buffer.push_back(ptr);
+    time_buffer.push_back(msg->header.stamp.toSec());
+    last_timestamp_lidar = msg->header.stamp.toSec();
+
     mtx_buffer.unlock();
     sig_buffer.notify_all();
 }
@@ -1113,8 +1133,9 @@ int main(int argc, char** argv)
     cout<<"debug:"<<debug<<" MIN_IMG_COUNT: "<<MIN_IMG_COUNT<<endl;
     pcl_wait_pub->clear();
     // pcl_visual_wait_pub->clear();
-    ros::Subscriber sub_pcl = nh.subscribe(lid_topic, 200000, standard_pcl_cbk);
-    ros::Subscriber sub_imu = nh.subscribe(imu_topic, 200000, imu_cbk);
+    ros::Subscriber sub_pcl = p_pre->lidar_type == AVIA ? \
+        nh.subscribe(lid_topic, 200000, livox_pcl_cbk) : \
+        nh.subscribe(lid_topic, 200000, standard_pcl_cbk);    ros::Subscriber sub_imu = nh.subscribe(imu_topic, 200000, imu_cbk);
     ros::Subscriber sub_img = nh.subscribe(img_topic, 200000, img_cbk);
     image_transport::Publisher img_pub = it.advertise("/rgb_img", 1);
     ros::Publisher pubLaserCloudFullRes = nh.advertise<sensor_msgs::PointCloud2>
